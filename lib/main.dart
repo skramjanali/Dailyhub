@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const DailyHub());
+void main() {
+  runApp(const DailyHub());
+}
+
+// ============================================================
+// DAILYHUB APP
+// ============================================================
 
 class DailyHub extends StatelessWidget {
   const DailyHub({super.key});
@@ -20,6 +26,67 @@ class DailyHub extends StatelessWidget {
     );
   }
 }
+
+// ============================================================
+// WALLET MANAGER
+// ============================================================
+
+class WalletManager {
+  static final ValueNotifier<double> balance =
+      ValueNotifier<double>(1250.00);
+
+  static final ValueNotifier<List<TransactionItem>> transactions =
+      ValueNotifier<List<TransactionItem>>([
+    TransactionItem(
+      icon: Icons.phone_android,
+      title: 'Mobile Recharge',
+      subtitle: 'Today • Successful',
+      amount: -199.00,
+    ),
+    TransactionItem(
+      icon: Icons.card_giftcard,
+      title: 'Referral Reward',
+      subtitle: 'Yesterday • Successful',
+      amount: 10.00,
+    ),
+  ]);
+
+  static void addMoney(double amount) {
+    balance.value += amount;
+
+    transactions.value = [
+      TransactionItem(
+        icon: Icons.add_card,
+        title: 'Money Added',
+        subtitle: 'Just now • Successful',
+        amount: amount,
+      ),
+      ...transactions.value,
+    ];
+  }
+}
+
+// ============================================================
+// TRANSACTION MODEL
+// ============================================================
+
+class TransactionItem {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final double amount;
+
+  const TransactionItem({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.amount,
+  });
+}
+
+// ============================================================
+// MAIN SHELL
+// ============================================================
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -47,8 +114,10 @@ class _MainShellState extends State<MainShell> {
         backgroundColor: Colors.white,
         indicatorColor: const Color(0xFFEAE6FF),
         selectedIndex: selected,
-        onDestinationSelected: (v) {
-          setState(() => selected = v);
+        onDestinationSelected: (value) {
+          setState(() {
+            selected = value;
+          });
         },
         destinations: const [
           NavigationDestination(
@@ -62,8 +131,12 @@ class _MainShellState extends State<MainShell> {
             label: 'Services',
           ),
           NavigationDestination(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: Icon(Icons.account_balance_wallet),
+            icon: Icon(
+              Icons.account_balance_wallet_outlined,
+            ),
+            selectedIcon: Icon(
+              Icons.account_balance_wallet,
+            ),
             label: 'Wallet',
           ),
           NavigationDestination(
@@ -77,7 +150,9 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
-// ================= HOME =================
+// ============================================================
+// HOME
+// ============================================================
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -118,8 +193,18 @@ class Home extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.notifications_none),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'No new notifications',
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.notifications_none,
+                  ),
                 ),
               ),
             ],
@@ -127,7 +212,10 @@ class Home extends StatelessWidget {
 
           const SizedBox(height: 18),
 
+          // ==================================================
           // WALLET CARD
+          // ==================================================
+
           Container(
             padding: const EdgeInsets.all(21),
             decoration: BoxDecoration(
@@ -149,7 +237,8 @@ class Home extends StatelessWidget {
               ],
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
@@ -168,7 +257,8 @@ class Home extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white24,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius:
+                            BorderRadius.circular(20),
                       ),
                       child: const Text(
                         'SAFE',
@@ -184,13 +274,20 @@ class Home extends StatelessWidget {
 
                 const SizedBox(height: 6),
 
-                const Text(
-                  '₹ 1,250.00',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                  ),
+                ValueListenableBuilder<double>(
+                  valueListenable:
+                      WalletManager.balance,
+                  builder:
+                      (context, balance, child) {
+                    return Text(
+                      '₹ ${balance.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 16),
@@ -201,11 +298,16 @@ class Home extends StatelessWidget {
                       child: FilledButton.icon(
                         style: FilledButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: Color(0xFF5A43E7),
+                          foregroundColor:
+                              const Color(0xFF5A43E7),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          _showAddMoneyDialog(context);
+                        },
                         icon: const Icon(Icons.add),
-                        label: const Text('Add Money'),
+                        label: const Text(
+                          'Add Money',
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -217,9 +319,21 @@ class Home extends StatelessWidget {
                             color: Colors.white54,
                           ),
                         ),
-                        onPressed: () {},
-                        icon: const Icon(Icons.history),
-                        label: const Text('History'),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const TransactionHistoryPage(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.history,
+                        ),
+                        label: const Text(
+                          'History',
+                        ),
                       ),
                     ),
                   ],
@@ -242,10 +356,22 @@ class Home extends StatelessWidget {
 
           Row(
             children: const [
-              Quick(Icons.phone_android, 'Recharge'),
-              Quick(Icons.tv, 'DTH'),
-              Quick(Icons.bolt, 'Electricity'),
-              Quick(Icons.receipt_long, 'Bills'),
+              Quick(
+                Icons.phone_android,
+                'Recharge',
+              ),
+              Quick(
+                Icons.tv,
+                'DTH',
+              ),
+              Quick(
+                Icons.bolt,
+                'Electricity',
+              ),
+              Quick(
+                Icons.receipt_long,
+                'Bills',
+              ),
             ],
           ),
 
@@ -263,7 +389,9 @@ class Home extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  _showComingSoon(context);
+                },
                 child: const Text('View all'),
               ),
             ],
@@ -275,49 +403,59 @@ class Home extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(22),
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0ECFF),
-                    borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(22),
+              onTap: () {
+                _showComingSoon(context);
+              },
+              child: Row(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF0ECFF),
+                      borderRadius:
+                          BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.card_giftcard,
+                      color: Color(0xFF5A43E7),
+                      size: 28,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.card_giftcard,
-                    color: Color(0xFF5A43E7),
-                    size: 28,
-                  ),
-                ),
 
-                const SizedBox(width: 14),
+                  const SizedBox(width: 14),
 
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Invite & Earn',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Invite & Earn',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Share your code and earn eligible rewards',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 12,
+                        SizedBox(height: 4),
+                        Text(
+                          'Share your code and earn eligible rewards',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                const Icon(Icons.chevron_right),
-              ],
+                  const Icon(
+                    Icons.chevron_right,
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -333,114 +471,195 @@ class Home extends StatelessWidget {
 
           const SizedBox(height: 8),
 
-          const Activity(
-            Icons.phone_android,
-            'Mobile Recharge',
-            'Today • Successful',
-            '- ₹199',
-          ),
+          ValueListenableBuilder<
+              List<TransactionItem>>(
+            valueListenable:
+                WalletManager.transactions,
+            builder:
+                (context, transactions, child) {
+              final recent =
+                  transactions.take(3).toList();
 
-          const Activity(
-            Icons.card_giftcard,
-            'Referral Reward',
-            'Yesterday • Successful',
-            '+ ₹10',
+              return Column(
+                children: recent
+                    .map(
+                      (item) =>
+                          Activity(item: item),
+                    )
+                    .toList(),
+              );
+            },
           ),
         ],
       ),
     );
   }
+
+  // ==========================================================
+  // ADD MONEY DIALOG
+  // ==========================================================
+
+  void _showAddMoneyDialog(BuildContext context) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text(
+            'Add Money',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: TextField(
+            controller: controller,
+            keyboardType:
+                const TextInputType.numberWithOptions(
+              decimal: true,
+            ),
+            decoration: const InputDecoration(
+              labelText: 'Enter amount',
+              hintText: '100',
+              prefixText: '₹ ',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final amount = double.tryParse(
+                  controller.text.trim(),
+                );
+
+                if (amount == null || amount <= 0) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Please enter a valid amount',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
+                if (amount > 100000) {
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Maximum demo amount is ₹1,00,000',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
+                WalletManager.addMoney(amount);
+
+                Navigator.pop(dialogContext);
+
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '₹${amount.toStringAsFixed(2)} added successfully',
+                    ),
+                  ),
+                );
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showComingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'This service will be connected soon',
+        ),
+      ),
+    );
+  }
 }
 
-// ================= QUICK ACTION =================
+// ============================================================
+// QUICK ACTION
+// ============================================================
 
 class Quick extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const Quick(this.icon, this.text, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.only(right: 7),
-        child: Column(
-          children: [
-            Container(
-              height: 68,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(19),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x09000000),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
-              child: Icon(
-                icon,
-                color: const Color(0xFF5A43E7),
-                size: 28,
-              ),
-            ),
-            const SizedBox(height: 7),
-            Text(
-              text,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ================= ACTIVITY =================
-
-class Activity extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String sub;
-  final String amount;
-
-  const Activity(
+  const Quick(
     this.icon,
-    this.title,
-    this.sub,
-    this.amount, {
+    this.text, {
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: const Color(0xFFF0ECFF),
-          child: Icon(
-            icon,
-            color: const Color(0xFF5A43E7),
-          ),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Text(sub),
-        trailing: Text(
-          amount,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
+    return Expanded(
+      child: Padding(
+        padding:
+            const EdgeInsets.only(right: 7),
+        child: InkWell(
+          borderRadius:
+              BorderRadius.circular(19),
+          onTap: () {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(
+              SnackBar(
+                content: Text(
+                  '$text service selected',
+                ),
+              ),
+            );
+          },
+          child: Column(
+            children: [
+              Container(
+                height: 68,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      BorderRadius.circular(19),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x09000000),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  icon,
+                  color:
+                      const Color(0xFF5A43E7),
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight:
+                      FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -448,7 +667,62 @@ class Activity extends StatelessWidget {
   }
 }
 
-// ================= SERVICES =================
+// ============================================================
+// ACTIVITY
+// ============================================================
+
+class Activity extends StatelessWidget {
+  final TransactionItem item;
+
+  const Activity({
+    required this.item,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isPositive = item.amount >= 0;
+
+    return Card(
+      elevation: 0,
+      color: Colors.white,
+      margin: const EdgeInsets.only(
+        bottom: 8,
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor:
+              const Color(0xFFF0ECFF),
+          child: Icon(
+            item.icon,
+            color:
+                const Color(0xFF5A43E7),
+          ),
+        ),
+        title: Text(
+          item.title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(item.subtitle),
+        trailing: Text(
+          '${isPositive ? '+' : '-'} ₹${item.amount.abs().toStringAsFixed(2)}',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isPositive
+                ? Colors.green
+                : Colors.black87,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// SERVICES
+// ============================================================
 
 class Services extends StatelessWidget {
   const Services({super.key});
@@ -523,7 +797,8 @@ class Services extends StatelessWidget {
 
           GridView.builder(
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics:
+                const NeverScrollableScrollPhysics(),
             itemCount: items.length,
             gridDelegate:
                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -532,36 +807,60 @@ class Services extends StatelessWidget {
               mainAxisSpacing: 12,
               childAspectRatio: 1.45,
             ),
-            itemBuilder: (_, i) {
+            itemBuilder: (_, index) {
               return Card(
                 elevation: 0,
                 color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        items[i][0] as IconData,
-                        color: const Color(0xFF5A43E7),
-                        size: 28,
-                      ),
-                      const Spacer(),
-                      Text(
-                        items[i][1] as String,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                child: InkWell(
+                  borderRadius:
+                      BorderRadius.circular(12),
+                  onTap: () {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${items[index][1]} selected',
                         ),
                       ),
-                      Text(
-                        items[i][2] as String,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.black54,
+                    );
+                  },
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.all(15),
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          items[index][0]
+                              as IconData,
+                          color: const Color(
+                            0xFF5A43E7,
+                          ),
+                          size: 28,
                         ),
-                      ),
-                    ],
+                        const Spacer(),
+                        Text(
+                          items[index][1]
+                              as String,
+                          style:
+                              const TextStyle(
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          items[index][2]
+                              as String,
+                          style:
+                              const TextStyle(
+                            fontSize: 11,
+                            color:
+                                Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -573,7 +872,9 @@ class Services extends StatelessWidget {
   }
 }
 
-// ================= WALLET =================
+// ============================================================
+// WALLET PAGE
+// ============================================================
 
 class Wallet extends StatelessWidget {
   const Wallet({super.key});
@@ -595,34 +896,46 @@ class Wallet extends StatelessWidget {
           const SizedBox(height: 18),
 
           Container(
-            padding: const EdgeInsets.all(22),
+            padding:
+                const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient:
+                  const LinearGradient(
                 colors: [
                   Color(0xFF5A43E7),
                   Color(0xFF8767F2),
                 ],
               ),
-              borderRadius: BorderRadius.circular(26),
+              borderRadius:
+                  BorderRadius.circular(26),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment:
                   CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Available Balance',
                   style: TextStyle(
                     color: Colors.white70,
                   ),
                 ),
-                SizedBox(height: 5),
-                Text(
-                  '₹ 1,250.00',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
+                const SizedBox(height: 5),
+                ValueListenableBuilder<double>(
+                  valueListenable:
+                      WalletManager.balance,
+                  builder:
+                      (context, balance, child) {
+                    return Text(
+                      '₹ ${balance.toStringAsFixed(2)}',
+                      style:
+                          const TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -630,26 +943,50 @@ class Wallet extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          const Text(
-            'Transactions',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Transactions',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          const TransactionHistoryPage(),
+                    ),
+                  );
+                },
+                child:
+                    const Text('View all'),
+              ),
+            ],
           ),
 
-          const Activity(
-            Icons.phone_android,
-            'Mobile Recharge',
-            'Successful • Demo',
-            '- ₹199',
-          ),
-
-          const Activity(
-            Icons.card_giftcard,
-            'Referral Reward',
-            'Successful • Demo',
-            '+ ₹10',
+          ValueListenableBuilder<
+              List<TransactionItem>>(
+            valueListenable:
+                WalletManager.transactions,
+            builder:
+                (context, transactions, child) {
+              return Column(
+                children: transactions
+                    .take(5)
+                    .map(
+                      (item) =>
+                          Activity(item: item),
+                    )
+                    .toList(),
+              );
+            },
           ),
         ],
       ),
@@ -657,20 +994,101 @@ class Wallet extends StatelessWidget {
   }
 }
 
-// ================= PROFILE =================
+// ============================================================
+// TRANSACTION HISTORY
+// ============================================================
+
+class TransactionHistoryPage
+    extends StatelessWidget {
+  const TransactionHistoryPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor:
+          const Color(0xFFF7F7FB),
+      appBar: AppBar(
+        title: const Text(
+          'Transaction History',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor:
+            const Color(0xFFF7F7FB),
+      ),
+      body: ValueListenableBuilder<
+          List<TransactionItem>>(
+        valueListenable:
+            WalletManager.transactions,
+        builder:
+            (context, transactions, child) {
+          if (transactions.isEmpty) {
+            return const Center(
+              child: Text(
+                'No transactions yet',
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding:
+                const EdgeInsets.all(18),
+            itemCount:
+                transactions.length,
+            itemBuilder: (_, index) {
+              return Activity(
+                item: transactions[index],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ============================================================
+// PROFILE
+// ============================================================
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final menu = [
+      [
+        Icons.person_outline,
+        'Account'
+      ],
+      [
+        Icons.card_giftcard,
+        'Referral & Rewards'
+      ],
+      [
+        Icons.notifications_none,
+        'Notifications'
+      ],
+      [
+        Icons.help_outline,
+        'Help & Support'
+      ],
+      [
+        Icons.privacy_tip_outlined,
+        'Privacy Policy'
+      ],
+    ];
+
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.all(18),
+        padding:
+            const EdgeInsets.all(18),
         children: [
           const CircleAvatar(
             radius: 44,
-            backgroundColor: Color(0xFFEAE6FF),
+            backgroundColor:
+                Color(0xFFEAE6FF),
             child: Icon(
               Icons.person,
               size: 48,
@@ -685,28 +1103,44 @@ class Profile extends StatelessWidget {
               'DailyHub User',
               style: TextStyle(
                 fontSize: 22,
-                fontWeight: FontWeight.bold,
+                fontWeight:
+                    FontWeight.bold,
               ),
             ),
           ),
 
           const SizedBox(height: 24),
 
-          for (final x in [
-            'Account',
-            'Referral & Rewards',
-            'Notifications',
-            'Help & Support',
-            'Privacy Policy',
-          ])
-            Card(
+          ...menu.map(
+            (item) => Card(
               elevation: 0,
+              color: Colors.white,
               child: ListTile(
-                title: Text(x),
-                trailing:
-                    const Icon(Icons.chevron_right),
+                leading: Icon(
+                  item[0] as IconData,
+                  color:
+                      const Color(0xFF5A43E7),
+                ),
+                title: Text(
+                  item[1] as String,
+                ),
+                trailing: const Icon(
+                  Icons.chevron_right,
+                ),
+                onTap: () {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${item[1]} selected',
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
+          ),
         ],
       ),
     );
