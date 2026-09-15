@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const DailyHubApp());
+void main() => runApp(const DailyHub());
 
-class DailyHubApp extends StatelessWidget {
-  const DailyHubApp({super.key});
+class DailyHub extends StatelessWidget {
+  const DailyHub({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,39 +12,43 @@ class DailyHubApp extends StatelessWidget {
       title: 'DailyHub',
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: const Color(0xFF3157E8),
-        scaffoldBackgroundColor: const Color(0xFFF6F7FB),
+        scaffoldBackgroundColor: const Color(0xFFF7F7FB),
+        colorSchemeSeed: const Color(0xFF5B45E8),
+        fontFamily: 'Roboto',
       ),
-      home: const AppShell(),
+      home: const MainShell(),
     );
   }
 }
 
-class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+class MainShell extends StatefulWidget {
+  const MainShell({super.key});
 
   @override
-  State<AppShell> createState() => _AppShellState();
+  State<MainShell> createState() => _MainShellState();
 }
 
-class _AppShellState extends State<AppShell> {
-  int tab = 0;
+class _MainShellState extends State<MainShell> {
+  int selected = 0;
 
   final pages = const [
-    HomePage(),
-    ServicesPage(),
-    WalletPage(),
-    ProfilePage(),
+    Home(),
+    Services(),
+    Wallet(),
+    Profile(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[tab],
+      body: pages[selected],
       bottomNavigationBar: NavigationBar(
-        selectedIndex: tab,
+        height: 72,
+        backgroundColor: Colors.white,
+        indicatorColor: const Color(0xFFEAE6FF),
+        selectedIndex: selected,
         onDestinationSelected: (v) {
-          setState(() => tab = v);
+          setState(() => selected = v);
         },
         destinations: const [
           NavigationDestination(
@@ -53,8 +57,8 @@ class _AppShellState extends State<AppShell> {
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.grid_view_outlined),
-            selectedIcon: Icon(Icons.grid_view),
+            icon: Icon(Icons.apps_outlined),
+            selectedIcon: Icon(Icons.apps),
             label: 'Services',
           ),
           NavigationDestination(
@@ -73,121 +77,274 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+// ================= HOME =================
+
+class Home extends StatelessWidget {
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 24),
         children: [
-          const Text(
-            'Welcome back 👋',
-            style: TextStyle(color: Colors.black54),
-          ),
-          const Text(
-            'DailyHub',
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 18),
-
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF3157E8),
-                  Color(0xFF7048E8),
-                ],
+          Row(
+            children: [
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Good morning 👋',
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 14,
+                      ),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      'DailyHub',
+                      style: TextStyle(
+                        fontSize: 29,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Wallet Balance',
-                  style: TextStyle(color: Colors.white70),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                SizedBox(height: 5),
-                Text(
-                  '₹ 1,250.00',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.notifications_none),
                 ),
-                SizedBox(height: 10),
-                Text(
-                  'Demo balance',
-                  style: TextStyle(color: Colors.white70),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 22),
-
-          const Text(
-            'Quick Services',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          GridView.count(
-            crossAxisCount: 4,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 12,
-            childAspectRatio: .8,
-            children: const [
-              ActionTile(Icons.phone_android, 'Recharge'),
-              ActionTile(Icons.tv, 'DTH'),
-              ActionTile(Icons.bolt, 'Electricity'),
-              ActionTile(Icons.receipt_long, 'Bills'),
-              ActionTile(Icons.qr_code_scanner, 'QR Scan'),
-              ActionTile(Icons.calculate, 'Calculator'),
-              ActionTile(Icons.pie_chart, 'Expenses'),
-              ActionTile(Icons.card_giftcard, 'Rewards'),
+              ),
             ],
           ),
 
           const SizedBox(height: 18),
 
-          Card(
-            elevation: 0,
-            child: ListTile(
-              leading: const CircleAvatar(
-                child: Icon(Icons.card_giftcard),
+          // WALLET CARD
+          Container(
+            padding: const EdgeInsets.all(21),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF5A43E7),
+                  Color(0xFF8767F2),
+                ],
               ),
-              title: const Text('Invite & Earn'),
-              subtitle: const Text(
-                'Share your referral code',
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => const AlertDialog(
-                    title: Text('Referral'),
-                    content: Text(
-                      'Your referral code: DH2026\n\n'
-                      'Demo reward: ₹10 per eligible referral.',
-                    ),
-                  ),
-                );
-              },
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: const [
+                BoxShadow(
+                  blurRadius: 22,
+                  offset: Offset(0, 10),
+                  color: Color(0x225A43E7),
+                ),
+              ],
             ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Total Wallet Balance',
+                        style: TextStyle(
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'SAFE',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 6),
+
+                const Text(
+                  '₹ 1,250.00',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Color(0xFF5A43E7),
+                        ),
+                        onPressed: () {},
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Money'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: const BorderSide(
+                            color: Colors.white54,
+                          ),
+                        ),
+                        onPressed: () {},
+                        icon: const Icon(Icons.history),
+                        label: const Text('History'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 23),
+
+          const Text(
+            'Quick Actions',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+
+          const SizedBox(height: 13),
+
+          Row(
+            children: const [
+              Quick(Icons.phone_android, 'Recharge'),
+              Quick(Icons.tv, 'DTH'),
+              Quick(Icons.bolt, 'Electricity'),
+              Quick(Icons.receipt_long, 'Bills'),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Rewards & Offers',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: const Text('View all'),
+              ),
+            ],
+          ),
+
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0ECFF),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.card_giftcard,
+                    color: Color(0xFF5A43E7),
+                    size: 28,
+                  ),
+                ),
+
+                const SizedBox(width: 14),
+
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Invite & Earn',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Share your code and earn eligible rewards',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Icon(Icons.chevron_right),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          const Text(
+            'Recent Activity',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          const Activity(
+            Icons.phone_android,
+            'Mobile Recharge',
+            'Today • Successful',
+            '- ₹199',
+          ),
+
+          const Activity(
+            Icons.card_giftcard,
+            'Referral Reward',
+            'Yesterday • Successful',
+            '+ ₹10',
           ),
         ],
       ),
@@ -195,57 +352,150 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class ActionTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
+// ================= QUICK ACTION =================
 
-  const ActionTile(
+class Quick extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const Quick(this.icon, this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(right: 7),
+        child: Column(
+          children: [
+            Container(
+              height: 68,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(19),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x09000000),
+                    blurRadius: 10,
+                  ),
+                ],
+              ),
+              child: Icon(
+                icon,
+                color: const Color(0xFF5A43E7),
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 7),
+            Text(
+              text,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ================= ACTIVITY =================
+
+class Activity extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String sub;
+  final String amount;
+
+  const Activity(
     this.icon,
-    this.label, {
+    this.title,
+    this.sub,
+    this.amount, {
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Center(
-              child: Icon(
-                icon,
-                size: 27,
-              ),
-            ),
+    return Card(
+      elevation: 0,
+      color: Colors.white,
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: const Color(0xFFF0ECFF),
+          child: Icon(
+            icon,
+            color: const Color(0xFF5A43E7),
           ),
         ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12),
-          textAlign: TextAlign.center,
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ],
+        subtitle: Text(sub),
+        trailing: Text(
+          amount,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
     );
   }
 }
 
-class ServicesPage extends StatelessWidget {
-  const ServicesPage({super.key});
+// ================= SERVICES =================
+
+class Services extends StatelessWidget {
+  const Services({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final services = [
-      'Mobile Recharge',
-      'DTH Recharge',
-      'Electricity Bill',
-      'Water Bill',
-      'QR Scanner',
-      'Expense Tracker',
+    final items = [
+      [
+        Icons.phone_android,
+        'Mobile Recharge',
+        'Prepaid & Postpaid'
+      ],
+      [
+        Icons.tv,
+        'DTH Recharge',
+        'Quick recharge'
+      ],
+      [
+        Icons.bolt,
+        'Electricity',
+        'Pay your bill'
+      ],
+      [
+        Icons.water_drop,
+        'Water Bill',
+        'Utility payment'
+      ],
+      [
+        Icons.qr_code_scanner,
+        'QR Scanner',
+        'Scan & pay'
+      ],
+      [
+        Icons.calculate,
+        'Calculator',
+        'Everyday tools'
+      ],
+      [
+        Icons.pie_chart_outline,
+        'Expenses',
+        'Track spending'
+      ],
+      [
+        Icons.card_giftcard,
+        'Rewards',
+        'Offers & referral'
+      ],
     ];
 
     return SafeArea(
@@ -256,28 +506,66 @@ class ServicesPage extends StatelessWidget {
             'Services',
             style: TextStyle(
               fontSize: 30,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 12),
-          ...services.map(
-            (service) => Card(
-              elevation: 0,
-              child: ListTile(
-                leading: const CircleAvatar(
-                  child: Icon(Icons.flash_on),
-                ),
-                title: Text(service),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('$service demo opened'),
-                    ),
-                  );
-                },
-              ),
+
+          const SizedBox(height: 5),
+
+          const Text(
+            'Everything you need in one place',
+            style: TextStyle(
+              color: Colors.black54,
             ),
+          ),
+
+          const SizedBox(height: 18),
+
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: items.length,
+            gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.45,
+            ),
+            itemBuilder: (_, i) {
+              return Card(
+                elevation: 0,
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        items[i][0] as IconData,
+                        color: const Color(0xFF5A43E7),
+                        size: 28,
+                      ),
+                      const Spacer(),
+                      Text(
+                        items[i][1] as String,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        items[i][2] as String,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -285,8 +573,10 @@ class ServicesPage extends StatelessWidget {
   }
 }
 
-class WalletPage extends StatelessWidget {
-  const WalletPage({super.key});
+// ================= WALLET =================
+
+class Wallet extends StatelessWidget {
+  const Wallet({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -298,26 +588,47 @@ class WalletPage extends StatelessWidget {
             'Wallet',
             style: TextStyle(
               fontSize: 30,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 15),
-
-          const Card(
-            elevation: 0,
-            child: ListTile(
-              title: Text('Available Balance'),
-              subtitle: Text(
-                '₹ 1,250.00',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              fontWeight: FontWeight.w800,
             ),
           ),
 
           const SizedBox(height: 18),
+
+          Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFF5A43E7),
+                  Color(0xFF8767F2),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(26),
+            ),
+            child: const Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Available Balance',
+                  style: TextStyle(
+                    color: Colors.white70,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  '₹ 1,250.00',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 20),
 
           const Text(
             'Transactions',
@@ -327,22 +638,18 @@ class WalletPage extends StatelessWidget {
             ),
           ),
 
-          const ListTile(
-            leading: CircleAvatar(
-              child: Icon(Icons.phone_android),
-            ),
-            title: Text('Mobile Recharge'),
-            subtitle: Text('SUCCESS • Demo'),
-            trailing: Text('-₹199'),
+          const Activity(
+            Icons.phone_android,
+            'Mobile Recharge',
+            'Successful • Demo',
+            '- ₹199',
           ),
 
-          const ListTile(
-            leading: CircleAvatar(
-              child: Icon(Icons.card_giftcard),
-            ),
-            title: Text('Referral Reward'),
-            subtitle: Text('SUCCESS • Demo'),
-            trailing: Text('+₹10'),
+          const Activity(
+            Icons.card_giftcard,
+            'Referral Reward',
+            'Successful • Demo',
+            '+ ₹10',
           ),
         ],
       ),
@@ -350,30 +657,27 @@ class WalletPage extends StatelessWidget {
   }
 }
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+// ================= PROFILE =================
+
+class Profile extends StatelessWidget {
+  const Profile({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      'Account',
-      'Referral & Rewards',
-      'Notifications',
-      'Help & Support',
-      'Privacy Policy',
-    ];
-
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.all(18),
         children: [
           const CircleAvatar(
-            radius: 42,
+            radius: 44,
+            backgroundColor: Color(0xFFEAE6FF),
             child: Icon(
               Icons.person,
-              size: 45,
+              size: 48,
+              color: Color(0xFF5A43E7),
             ),
           ),
+
           const SizedBox(height: 12),
 
           const Center(
@@ -386,19 +690,23 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
 
-          ...items.map(
-            (item) => Card(
+          for (final x in [
+            'Account',
+            'Referral & Rewards',
+            'Notifications',
+            'Help & Support',
+            'Privacy Policy',
+          ])
+            Card(
               elevation: 0,
               child: ListTile(
-                title: Text(item),
-                trailing: const Icon(
-                  Icons.chevron_right,
-                ),
+                title: Text(x),
+                trailing:
+                    const Icon(Icons.chevron_right),
               ),
             ),
-          ),
         ],
       ),
     );
